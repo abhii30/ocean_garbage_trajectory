@@ -24,6 +24,6 @@ response = requests.get(
 )
 
 # Do something with response data.
-json_data = response.json()
-with open('data.json') as f:
-    json.dump(json_data, f)
+json_data = json.dumps(response.json())
+with open('data.json', 'a') as f:
+    f.write(json_data)
