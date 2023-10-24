@@ -1,29 +1,26 @@
-# api.meteomatics.com/validdatetime/parameters/locations/format?optionals
-import arrow
-import requests
-import json
+import meteomatics.api as api
+import datetime as dt
+from dotenv import load_dotenv
+import os
 
-# Get first hour of today
-start = arrow.now().floor('day')
+def meteomatics_data(username, password, latitude, longitude, parameters, startdate=None, enddate=None, interval=None):
+    if not startdate:
+        startdate = dt.datetime.utcnow()
+    if not enddate:
+        enddate = startdate + dt.timedelta(days=1)
+    if not interval:
+        interval = dt.timedelta(hours=1)
+        
+    coordinates = [(latitude, longitude)]
+    df = api.query_time_series(coordinates, startdate, enddate, interval, parameters, username, password)
+    return df
+  
+load_dotenv()
+username = os.getenv("WEATHER_USERNAME")
+password = os.getenv("WEATHER_PASSWORD")
+latitude = float(input("Enter Latitude: "))
+longitude = float(input("Enter Longitude: "))
+parameters_meteomatics = ['wind_speed_2m:ms', 'wind_dir_2m:d', 'ocean_current_speed:ms', 'ocean_current_direction:d']
 
-# Get last hour of today
-end = arrow.now().ceil('day')
-
-response = requests.get(
-  'https://api.stormglass.io/v2/weather/point',
-  params={
-    'lat': 18.4384,
-    'lng': 70.3781,
-    'params': ','.join(['currentDirection', 'currentSpeed', 'swellDirection', 'waveDirection', 'windSpeed']),
-    'start': start.to('UTC').timestamp(),  # Convert to UTC timestamp
-    'end': end.to('UTC').timestamp()  # Convert to UTC timestamp
-  },
-  headers={
-    'Authorization': '7e071af0-6f24-11ee-a654-0242ac130002-7e071b4a-6f24-11ee-a654-0242ac130002'
-  }
-)
-
-# Do something with response data.
-json_data = json.dumps(response.json())
-with open('data.json', 'a') as f:
-    f.write(json_data)
+weather_data = meteomatics_data(username, password, latitude, longitude, parameters_meteomatics)
+print(weather_data)
