@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 
 def meteomatics_data(username, password, latitude, longitude, parameters, startdate=None, enddate=None, interval=None):
+    location = None
     if not startdate:
         startdate = dt.datetime.utcnow()
     if not enddate:
@@ -13,9 +14,16 @@ def meteomatics_data(username, password, latitude, longitude, parameters, startd
         
     coordinates = [(latitude, longitude)]
     df = api.query_time_series(coordinates, startdate, enddate, interval, parameters, username, password)
-    return df
-  
+    
+    if df['ocean_current_speed:ms'].isnull().all():
+        location = "Land"
+    else:
+        location = "Ocean"
+
+    return df, location
+
 load_dotenv()
+
 username = os.getenv("WEATHER_USERNAME")
 password = os.getenv("WEATHER_PASSWORD")
 latitude = float(input("Enter Latitude: "))
