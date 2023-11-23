@@ -1,4 +1,4 @@
-// import React, { useState } from "react";
+import { useState } from "react";
 import {
   ComposableMap,
   Geographies,
@@ -14,55 +14,100 @@ import "./App.css";
 function App() {
   const geoUrl =
     "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
-  const markers = [
-    [-48.83, 39.85],
-    [-47.06002625155747, 51.53229254971389],
-    [-72.05, 37.97],
-    [-71.36921425052961, 42.75502193467757],
-  ];
-  const markers0 = [
-    [-48.83, 39.85],
-    [-52.70017467104684, 37.99491255569573],
-    [-49.49037783679882, 40.43587303153542],
-    [-51.172143350395146, 44.38537961282664],
-    [-54.188074585896025, 45.09755822599109],
-    [-51.344556091493, 46.68984996207766],
-    [-52.08842906312116, 44.066888236253476],
-    [-48.376510231122005, 42.73254472546684],
-    [-45.1785707217469, 41.21324008431714],
-    [-42.35716709824415, 43.512427593701275],
-    [-41.71256687555116, 46.511588843872396],
-    [-43.88161275803958, 45.45634367052359],
-    [-41.38129122520672, 46.97407715193478],
-    [-41.98430150727897, 44.48196048134338],
-    [-42.58577401636591, 46.5471340864777],
-    [-44.76780898366517, 47.658253107223764],
-    [-44.389016351494305, 50.89341247825424],
-    [-47.11056268095555, 50.60570193698528],
-    [-46.435443621950476, 50.94272646966464],
-    [-46.82185912405621, 51.02878258931485],
-    [-47.06002625155747, 51.53229254971389],
-  ];
-  const markers1 = [
-    [-72.05, 37.97],
-    [-69.970797020529, 39.87653031364603],
-    [-70.60882798937952, 41.422014410270144],
-    [-71.36921425052961, 42.75502193467757],
-    [-71.36921425052961, 42.75502193467757],
-    [-71.36921425052961, 42.75502193467757],
-    [-71.36921425052961, 42.75502193467757],
-    [-71.36921425052961, 42.75502193467757],
-    [-71.36921425052961, 42.75502193467757],
-    [-71.36921425052961, 42.75502193467757],
-  ];
+  const [longitude, setLongitude] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [positions, setPositions] = useState("");
+  const [showMarkers, setShowMarkers] = useState(false);
+  const [startMark, setStartMark] = useState([]);
 
+  const clearFields = () => {
+    setLatitude("");
+    setLongitude("");
+  };
+  // const handleClicked = () => {
+  //   if (!latitude || !longitude) {
+  //     alert("Please enter the coordinates");
+  //   }
+  //   const lat = parseFloat(latitude);
+  //   const long = parseFloat(longitude);
+  //   if (lat > 90 || lat < -90 || long > 180 || long < -180) {
+  //     alert("Please enter the correct coordinates");
+  //     clearFields();
+  //   }
+  //   const marker = [long, lat];
+  //   markers.push(marker);
+  //   console.log(markers);
+  //   clearFields();
+  // };
+
+  const handleSimulation = async () => {
+    try {
+      const simulatedPositions = await fetch("http://127.0.0.1:5000", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          latitude,
+          longitude,
+        }),
+      }).then((response) => response.json());
+      const marker = [parseFloat(longitude), parseFloat(latitude)];
+      setStartMark([marker]);
+      console.log(startMark);
+      setShowMarkers(true);
+      const positionArray = Object.values(simulatedPositions);
+      console.log(positionArray[0]);
+      setPositions(positionArray);
+    } catch (error) {
+      console.log("Error fetching data :", error);
+    }
+  };
+
+  const handleReset = () => {
+    setShowMarkers(false);
+    clearFields();
+  };
   return (
     <div className="App">
-      <h1 className="head">Ocean Garbage Trajectory</h1>
+      <div className="head-group">
+        <h1 className="head">Ocean Garbage Trajectory</h1>
+        <div className="input-div">
+          <div className="input-group">
+            <label className="input-label">Longitude</label>
+            <input
+              type="text"
+              className="input-box"
+              value={longitude}
+              onChange={(e) => setLongitude(e.target.value)}
+            />
+          </div>
+          <div className="input-group">
+            <label className="input-label">Latitude</label>
+            <input
+              type="text"
+              className="input-box"
+              value={latitude}
+              onChange={(e) => setLatitude(e.target.value)}
+            />
+          </div>
+        </div>
+        <span>
+          {!longitude || !latitude
+            ? "Please enter the coordinates"
+            : `Longitude: ${longitude}, Latitude: ${latitude}`}
+        </span>
+        <div className="button-group">
+          <button onClick={handleSimulation}>Show Path</button>
+          <button onClick={handleReset} style={{ backgroundColor: "red" }}>
+            Reset
+          </button>
+        </div>
+      </div>
       <div
         style={{
-          width: "1000px",
-          padding: "0vh 2vh",
+          width: "800px",
+          // padding: "0vh 2vh",
           borderStyle: "double",
           borderColor: "black",
         }}
@@ -76,44 +121,26 @@ function App() {
                 ))
               }
             </Geographies>
-            {markers.map((marker, i) => (
-              <Marker key={i} coordinates={marker}>
-                <circle r={2} fill="#F53" />
-              </Marker>
-            ))}
-            {/* {markers1.map((marker, i) => (
-              <Marker key={i} coordinates={marker}>
-                <circle r={0.1} fill="#F53" />
-              </Marker>
-            ))} */}
-            {markers0.map(
-              (coordinates, i) =>
-                i < markers0.length - 1 && (
-                  <Line
-                    key={i}
-                    from={coordinates}
-                    to={markers0[i + 1]}
-                    strokeWidth={1}
-                  />
-                )
-            )}
-            {markers1.map(
-              (coordinates, i) =>
-                i < markers1.length - 1 && (
-                  <Line
-                    key={i}
-                    from={coordinates}
-                    to={markers1[i + 1]}
-                    strokeWidth={1}
-                  />
-                )
-            )}
-            {/* {markers1.map(
-              (coordinates, i) =>
-                i < markers1.length - 1 && (
-                  <Line key={i} from={coordinates} to={markers1[i + 1]} />
-                )
-            )} */}
+            {showMarkers &&
+              startMark.map((marker, i) => (
+                <Marker key={i} coordinates={marker}>
+                  <circle r={2} fill="#F53" />
+                </Marker>
+              ))}
+
+            {showMarkers &&
+              positions[0].map(
+                (coordinates, index) =>
+                  index < positions.length - 1 && (
+                    <Line
+                      key={index}
+                      from={coordinates}
+                      to={positions[index + 1]}
+                      strokeWidth={1}
+                      fill="#F53"
+                    />
+                  )
+              )}
           </ZoomableGroup>
         </ComposableMap>
       </div>

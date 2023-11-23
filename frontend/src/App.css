@@ -4,4 +4,55 @@
   padding: 1rem;
   text-align: center;
 }
+.App {
+  display: flex;
+  flex-direction: rpw;
+  align-items: center;
+  gap: 4rem;
+}
+.head-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.input-div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+.input-group {
+  display: flex;
+  flex-direction: column;
+}
+.input-label {
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: left;
+  color: black;
+}
+.input-box {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  padding: 0.3rem;
+  color: black;
+}
+.input-box:focus {
+  outline: none;
+  border: 1px solid #000;
+}
+.head {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: left;
+}
 
+.button-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
