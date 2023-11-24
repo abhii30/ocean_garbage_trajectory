@@ -4,6 +4,9 @@
   padding: 1rem;
   text-align: center;
 }
+.head {
+  text-align: center;
+}
 .App {
   display: flex;
   flex-direction: rpw;

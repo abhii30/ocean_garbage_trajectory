@@ -33,6 +33,6 @@ for i in range(50):
                 positions.append(list(garbage.get_position()))
             break
     positions.append(simulate_garbage_movement(garbage, current_velocity, air_velocity, map_Lon_lim))
-    startdate = startdate + interval 
+    startdate = startdate
 
-print(positions)
+print(current_velocity, air_velocity)

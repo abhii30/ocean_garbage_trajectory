@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from trajectory_model.garbage_math_model import Garbage, simulate_garbage_movement
 from data_collection.weatherData import meteomatics_data
-
 import os
 import datetime as dt
 
@@ -29,13 +28,13 @@ def simulate_positions(latitude, longitude):
     parameters_meteomatics = ['wind_speed_2m:ms', 'wind_dir_2m:d', 'ocean_current_speed:ms', 'ocean_current_direction:d']
     # Your simulation code here
     # This is a simplified version of your original code
-    positions = []
-    garbage = Garbage(latitude, longitude)
+    positions = [[latitude,longitude]]
+    garbage = Garbage(latitude,longitude)
     startdate = dt.datetime.utcnow()
     interval = dt.timedelta(hours=12)
     year_balance = dt.timedelta(hours=8760)
 
-    for i in range(50):
+    for i in range(40):
     
         latitude, longitude = garbage.get_position()
 
@@ -51,12 +50,11 @@ def simulate_positions(latitude, longitude):
                     positions.append(list(garbage.get_position()))
                 break
         positions.append(simulate_garbage_movement(garbage, current_velocity, air_velocity, map_Lon_lim))
-        startdate = startdate + interval 
         # Your simulation logic here
         
         # Append simulated position to the positions list
-        positions.append(garbage.get_position())
-        startdate = startdate + interval
+        # positions.append(garbage.get_position())
+        startdate = startdate
 
     return positions
 
